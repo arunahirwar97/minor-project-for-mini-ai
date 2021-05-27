@@ -1,0 +1,10 @@
+django
+os
+pytube
+pytesseract
+shutil
+moviepy
+getpass
+glob
+PIL
+pathlib
