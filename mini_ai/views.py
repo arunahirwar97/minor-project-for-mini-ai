@@ -1,144 +1,80 @@
 from django.shortcuts import render
-import numpy as np
+from django.shortcuts import render, redirect 
+from .models import ocr_model   
+from .forms import *
+from pytube import YouTube
 from PIL import Image
-# import cv2
-import matplotlib.pyplot as plt
 import pytesseract 
-
-
+import glob
+import getpass
+import moviepy.editor as mp
+import shutil
 # Create your views here.
 def index(request):
-    pytesseract.pytesseract.tesseract_cmd = r'G:\tesseract\tesseract.exe'
+    alert_message = False
+    if request.method == 'POST': 
+        
+        submitted_form = ocr_forms(request.POST, request.FILES)
+        if submitted_form.is_valid():
+            submitted_form.save()   
+            pytesseract.pytesseract.tesseract_cmd = r'.\\tesseract\\tesseract.exe'
+            path = glob.glob('.\\media\\images\\*')
+            img = path[0]
+            tt = pytesseract.image_to_string(img)
+            z = print(tt)
+            print(len(tt))
+            shutil.rmtree("./media/images")
+            alert_message = {
+                'status': True,
+                'message': 'Successfully saved the image'
+            }
+            return render(request, 'index.html',{'number':tt})
 
-    img = Image.open("H:/project/IMG_20201224_220643.jpg")
-    plt.figure(figsize = (20,10))
-    plt.imshow(img)
-
-    tt = pytesseract.image_to_string(img)
-    z = print(tt)
-
-    return render(request,'index.html',{'number': tt})
-
-
-
-
-# from PIL import Image
-
-# im = Image.open('Foto.jpg')
-# im.save('Foto.png')
-
-
-
-# from PIL import Image
-
-# image1 = Image.open(r'path where the image is stored\file name.png')
-# im1 = image1.convert('RGB')
-# im1.save(r'path where the pdf will be stored\new file name.pdf')
-
-
-
-# Python program to create
-# a pdf file
-
-
-# from fpdf import FPDF
-
-
-# # save FPDF() class into a
-# # variable pdf
-# pdf = FPDF()
-
-# # Add a page
-# pdf.add_page()
-
-# # set style and size of font
-# # that you want in the pdf
-# pdf.set_font("Arial", size = 15)
-
-# # create a cell
-# pdf.cell(200, 10, txt = "GeeksforGeeks",
-# 		ln = 1, align = 'C')
-
-# # add another cell
-# pdf.cell(200, 10, txt = "A Computer Science portal for geeks.",
-# 		ln = 2, align = 'C')
-
-# # save the pdf with name .pdf
-# pdf.output("GFG.pdf")
-
-
-
-
-
-
-        # <div class="Neon Neon-theme-dragdropbox">
-        # <input style="z-index: 999; opacity: 0; width: 320px; height: 200px; position: absolute; right: 0px; left: 0px; margin-right: auto; margin-left: auto;" name="files[]" id="filer_input2" multiple="multiple" type="file">
-        # <div class="Neon-input-dragDrop"><div class="Neon-input-inner"><div class="Neon-input-icon"><i class="fa fa-file-image-o"></i></div><div class="Neon-input-text"><h3>Drag&amp;Drop files here</h3> <span style="display:inline-block; margin: 15px 0">or</span></div><a class="Neon-input-choose-btn blue">Browse Files</a></div></div>
-        # </div>
-
-
-#                 .Neon {
-#     font-family: sans-serif;
-#     font-size: 14px;
-#     color: #494949;
-#     position: relative;
+        else:
+            print("<<<<<<<<<<<<<<1111111111111111111111111111111111111111111<<<>>>>>>>>>>")
+    
+            alert_message = {
+                'status': False,
+                'message': 'Form data is invalid. Please check if your image / title is repeated'
+            }
     
 
-# }
-# .Neon * {
-#     -webkit-box-sizing: border-box;
-#     -moz-box-sizing: border-box;
-#     box-sizing: border-box;
-# }
-# .Neon-input-dragDrop {
-#     display: block;
-#     width: 343px;
-#     margin: 0 auto 25px auto;
-#     padding: 25px;
-#     color: #8d9499;
-#     color: #97A1A8;
-#     background: #fff;
-#     border: 2px dashed #C8CBCE;
-#     text-align: center;
-#     -webkit-transition: box-shadow 0.3s, border-color 0.3s;
-#     -moz-transition: box-shadow 0.3s, border-color 0.3s;
-#     transition: box-shadow 0.3s, border-color 0.3s;
-# }
-# .Neon-input-dragDrop .Neon-input-icon {
-#     font-size: 48px;
-#     margin-top: -10px;
-#     -webkit-transition: all 0.3s ease;
-#     -moz-transition: all 0.3s ease;
-#     transition: all 0.3s ease;
-# }
-# .Neon-input-text h3 {
-#     margin: 0;
-#     font-size: 18px;
-# }
-# .Neon-input-text span {
-#     font-size: 12px;
-# }
-# .Neon-input-choose-btn.blue {
-#     color: #008BFF;
-#     border: 1px solid #008BFF;
-# }
-# .Neon-input-choose-btn {
-#     display: inline-block;
-#     padding: 8px 14px;
-#     outline: none;
-#     cursor: pointer;
-#     text-decoration: none;
-#     text-align: center;
-#     white-space: nowrap;
-#     font-size: 12px;
-#     font-weight: bold;
-#     color: #8d9496;
-#     border-radius: 3px;
-#     border: 1px solid #c6c6c6;
-#     vertical-align: middle;
-#     background-color: #fff;
-#     box-shadow: 0px 1px 5px rgba(0,0,0,0.05);
-#     -webkit-transition: all 0.2s;
-#     -moz-transition: all 0.2s;
-#     transition: all 0.2s;
-# }
+    return render(request, 'index.html')
+
+
+
+def mp4_video(request):
+    if request.method == 'POST':
+        url = request.POST.get('url',None)
+        print(url)
+        username = getpass.getuser()
+        print(username)
+        title = YouTube(url).title
+        z = YouTube(url).streams.first().download("C:/Users/{}/Downloads".format(username))
+        print(z)
+        return render(request,'youtubetomp4.html',{"title":title})
+        
+    return render(request,'youtubetomp4.html')
+    
+
+def mp3_video(request):
+    
+    if request.method == 'POST':
+        url = request.POST.get('url',None)
+        print(url)
+        username = getpass.getuser()
+        aa = YouTube(url).streams.first().download("C:/Users/{}/AppData/Local/Temp/".format(username))
+        title = YouTube(url).title
+        print(aa)
+        print(title)
+        VIDEO_FILE = "C:/Users/{}/AppData/Local/Temp/".format(username)+title+".mp4" # Video File Location
+        OUTPUT_AUDIO_FILE = "C:/Users/{}/Downloads/".format(username)+title+".mp3"  # Audio File Location Where are you store audio file 
+        v_c = mp.VideoFileClip(VIDEO_FILE)
+        v_c.audio.write_audiofile(OUTPUT_AUDIO_FILE)
+        return render(request,'youtubevideomp3.html',{'title':title})
+
+    return render(request,'youtubevideomp3.html')
+
+
+
+

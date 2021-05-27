@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1tpthq&*$r3bhgkpiv43-)-=f_rt@egpr-u-nz$jj6w(@l9mjb'
+SECRET_KEY = 'w*cqirnwjb(sr@vgh6kuje8uo&2(y8eobplpvwqx5ypf1*a3to'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -38,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mini_ai'
+    'mini_ai',
 ]
 
 MIDDLEWARE = [
@@ -68,15 +67,14 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 
-PROJECT_TEMPLATES = [
-    os.path.join(BASE_DIR, 'templates'),
-    os.path.join(BASE_DIR, 'venv/lib/site-packages/django/contrib/admin/templates')
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': PROJECT_TEMPLATES,
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -84,11 +82,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-        #      'loaders': [
-        #     'django.template.loaders.filesystem.Loader',
-        #     'django.template.loaders.app_directories.Loader',
-        #     'admin_tools.template_loaders.Loader',
-        # ],
         },
     },
 ]
@@ -102,7 +95,7 @@ WSGI_APPLICATION = 'MINIAI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
